@@ -1,6 +1,7 @@
 package Controllers.AdministratorController;
 
 import DataManager.AppointmentsRepo;
+import DataManager.UserRepo;
 import Models.*;
 import Views.Administrator.AdministratorStaffView;
 
@@ -11,12 +12,15 @@ import java.util.List;
 import java.util.Scanner;
 
 public class AdministratorStaffController {
+
+    Scanner scanner = new Scanner(System.in);
     private Administrator admin;
     private AdministratorStaffView adminView;
     private List<User> users;
     private List<Appointment> appointments;
 
-    public AdministratorStaffController(){}
+    public AdministratorStaffController() {
+    }
 
     public AdministratorStaffController(Administrator admin, List<User> users, List<Appointment> appointments) {
         this.admin = admin;
@@ -25,7 +29,7 @@ public class AdministratorStaffController {
         this.appointments = appointments;
     }
 
-    public void manageHospitalStaff() {
+    public void manageHospitalStaff() throws IOException, ClassNotFoundException {
         while (true) {
             adminView.displayStaffManagementMenu();
             int choice = adminView.getChoiceInput();
@@ -51,11 +55,11 @@ public class AdministratorStaffController {
         }
     }
 
-    private void viewAllStaff() {
+    private void viewAllStaff() throws IOException, ClassNotFoundException {
         System.out.println("All Hospital Staff:");
         for (User user : users) {
             if (!(user instanceof Patient)) {
-                adminView.displayAllStaff(user);
+                adminView.displayAllStaff();
             }
         }
     }
@@ -107,38 +111,96 @@ public class AdministratorStaffController {
         }
     }
 
-    private void updateStaff() {
-        // Update logic goes here (similar to addNewStaff)
-        // The implementation can prompt the admin for updated details
-    }
+    private void updateStaff() throws IOException, ClassNotFoundException {
 
-    private String generateUserID(String role) {
-        // Generate unique user ID based on role
-        return role.substring(0, 2).toUpperCase() + System.currentTimeMillis();
-    }
+        adminView.displayAllStaff();
+        System.out.println("Enter User id to update the user");
+        String EnteredID = scanner.nextLine();
 
-    private List<Appointment> getAllAppointments() throws IOException, ClassNotFoundException {
-        AppointmentsRepo app = new AppointmentsRepo();
 
-        app.loadData();
+        User user = adminView.findUserById(EnteredID);
 
-        List<Appointment> appointments1 = new ArrayList<>();
+        UserRepo userRepo = new UserRepo();
+        User userToUpdate = null;
 
-        appointments1 = app.getData();
-
-        return appointments1;
-    }
-    public void viewAppointmentsDetails() throws IOException, ClassNotFoundException {
-        List<Appointment> appointmentsList = new ArrayList<>();
-        appointmentsList = getAllAppointments();
-        int length = appointmentsList.size();
-
-        if(length == 0){
-            System.out.println("No Appointments");
+        if (user.getUserID().equals(EnteredID) && !(user instanceof Patient)) {
+            userToUpdate = user;
         }
-        System.out.println("All Appointments:");
-        for (Appointment apt : appointmentsList) {
-            adminView.displayAppointments(apt);
+
+        if (userToUpdate != null) {
+            String newName = adminView.getNameInput();
+            if (!newName.isEmpty()) {
+                userToUpdate.setName(newName);
+            }
+
+            // Update password
+            System.out.println("Enter New Password");
+            String newPassword = scanner.nextLine();
+            if (!newPassword.isEmpty()) {
+                userToUpdate.setPassword(newPassword);
+            }
+
+            // Update gender
+            System.out.println("Enter Gender");
+            String newGender = scanner.nextLine();
+            if (!newGender.isEmpty()) {
+                userToUpdate.setGender(newGender);
+            }
+
+            // Update age
+            Integer newAge = adminView.getAgeInput();
+            if (newAge != null) {
+                userToUpdate.setAge(newAge);
+            }
+
+            // Special handling for Doctor specialization and availability
+            if (userToUpdate instanceof Doctor) {
+                Doctor doctor = (Doctor) userToUpdate;
+
+                String newSpecialization = adminView.getSpecializationInput();
+                if (!newSpecialization.isEmpty()) {
+                    doctor.setSpecialization(newSpecialization);
+                }
+
+                List<LocalDateTime> newAvailability = adminView.getAvailabilityInput();
+                if (!newAvailability.isEmpty()) {
+                    doctor.setAvailability(newAvailability);
+                }
+            }
+            userRepo.saveData();
+
+            adminView.displayAllStaff();
+        } else {
+            adminView.displayError("Invalid User ID or not authorized to update.");
         }
     }
-}
+
+        private String generateUserID (String role){
+            return role.substring(0, 2).toUpperCase() + System.currentTimeMillis();
+        }
+
+        private List<Appointment> getAllAppointments () throws IOException, ClassNotFoundException {
+            AppointmentsRepo app = new AppointmentsRepo();
+
+            app.loadData();
+
+            List<Appointment> appointments1 = new ArrayList<>();
+
+            appointments1 = app.getData();
+
+            return appointments1;
+        }
+        public void viewAppointmentsDetails () throws IOException, ClassNotFoundException {
+            List<Appointment> appointmentsList = new ArrayList<>();
+            appointmentsList = getAllAppointments();
+            int length = appointmentsList.size();
+
+            if (length == 0) {
+                System.out.println("No Appointments");
+            }
+            System.out.println("All Appointments:");
+            for (Appointment apt : appointmentsList) {
+                adminView.displayAppointments(apt);
+            }
+        }
+    }

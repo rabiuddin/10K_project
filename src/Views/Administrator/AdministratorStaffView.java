@@ -1,8 +1,10 @@
 package Views.Administrator;
 
+import DataManager.UserRepo;
 import Models.Appointment;
 import Models.User;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,8 +27,29 @@ public class AdministratorStaffView {
         System.out.print("Enter your choice: ");
     }
 
-    public void displayAllStaff(User user) {
-        System.out.println(user.getUserID() + " - " + user.getName() + " (" + user.getRole() + ")");
+    public void displayAllStaff() throws IOException, ClassNotFoundException {
+        UserRepo userRepo = new UserRepo();
+        List<User> users = new ArrayList<>();
+        userRepo.loadData();
+        users = userRepo.getData();
+
+        for(User user: users) {
+            System.out.println(user.getUserID() + " - " + user.getName() + " (" + user.getRole() + ")");
+        }
+    }
+    public User findUserById(String id) throws IOException, ClassNotFoundException {
+        UserRepo userRepo = new UserRepo();
+        List<User> users = new ArrayList<>();
+        userRepo.loadData();
+        users = userRepo.getData();
+
+        for(User user: users){
+            if(user.getUserID().equals(id)){
+                return user;
+            }
+        }
+        System.out.println("User not found");
+        return null;
     }
 
     public String getRoleInput() {
