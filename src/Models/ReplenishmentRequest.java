@@ -4,6 +4,10 @@ import java.io.Serializable;
 
 public class ReplenishmentRequest implements Serializable {
     private Medication medication;
+    private String id;
+
+
+
     private int quantity;
     private boolean approved;
 
@@ -38,5 +42,13 @@ public class ReplenishmentRequest implements Serializable {
 
     public void setApproved(boolean approved) {
         this.approved = approved;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 }

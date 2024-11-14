@@ -19,14 +19,19 @@ public class AdministratorStaffController {
     private List<User> users;
     private List<Appointment> appointments;
 
-    public AdministratorStaffController() {
-    }
+    private UserRepo userRepo;
 
-    public AdministratorStaffController(Administrator admin, List<User> users, List<Appointment> appointments) {
-        this.admin = admin;
+  
+    public AdministratorStaffController() throws IOException, ClassNotFoundException {
         this.adminView = new AdministratorStaffView();
-        this.users = users;
-        this.appointments = appointments;
+        this.users = new ArrayList<>();
+        this.appointments = new ArrayList<>();
+
+        userRepo = new UserRepo();
+
+        userRepo.loadData();
+
+        users = userRepo.getData();
     }
 
     public void manageHospitalStaff() throws IOException, ClassNotFoundException {
@@ -64,7 +69,8 @@ public class AdministratorStaffController {
         }
     }
 
-    private void addNewStaff() {
+    private void addNewStaff() throws IOException, ClassNotFoundException {
+
         String role = adminView.getRoleInput();
         String name = adminView.getNameInput();
         String password = adminView.getPasswordInput();
@@ -91,10 +97,12 @@ public class AdministratorStaffController {
         }
 
         users.add(newUser);
+        userRepo.setUsers(users);
+        userRepo.saveData();
         adminView.displayNewStaffAdded(userID);
     }
 
-    private void removeStaff() {
+    private void removeStaff() throws IOException {
         String userID = adminView.getUserIDToRemove();
         User userToRemove = null;
         for (User user : users) {
@@ -105,6 +113,8 @@ public class AdministratorStaffController {
         }
         if (userToRemove != null) {
             users.remove(userToRemove);
+            userRepo.setUsers(users);
+            userRepo.saveData();
             adminView.displayStaffRemoved();
         } else {
             adminView.displayError("Invalid User ID or not authorized to remove.");
@@ -119,8 +129,6 @@ public class AdministratorStaffController {
 
 
         User user = adminView.findUserById(EnteredID);
-
-        UserRepo userRepo = new UserRepo();
         User userToUpdate = null;
 
         if (user.getUserID().equals(EnteredID) && !(user instanceof Patient)) {
@@ -154,8 +162,7 @@ public class AdministratorStaffController {
             }
 
             // Special handling for Doctor specialization and availability
-            if (userToUpdate instanceof Doctor) {
-                Doctor doctor = (Doctor) userToUpdate;
+            if (userToUpdate instanceof Doctor doctor) {
 
                 String newSpecialization = adminView.getSpecializationInput();
                 if (!newSpecialization.isEmpty()) {
@@ -167,8 +174,9 @@ public class AdministratorStaffController {
                     doctor.setAvailability(newAvailability);
                 }
             }
+            users.add(userToUpdate);
+            userRepo.setUsers(users);
             userRepo.saveData();
-
             adminView.displayAllStaff();
         } else {
             adminView.displayError("Invalid User ID or not authorized to update.");
