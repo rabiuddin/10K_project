@@ -19,7 +19,7 @@ public class AdministratorInventoryController {
         this.inventoryRepo = new InventoryRepo();
     }
 
-    public void manageInventory() throws IOException, ClassNotFoundException {
+    public void manageInventory(Administrator administrator) throws IOException, ClassNotFoundException {
         while (true) {
             inventoryView.displayInventoryMenu();
             String choice = inventoryView.getChoice();

@@ -1,6 +1,7 @@
 package Controllers.AdministratorController;
 
 import DataManager.ReplenishmentRequestRepo;
+import Models.Administrator;
 import Models.ReplenishmentRequest;
 import Views.Administrator.AdministratorView;
 
@@ -23,7 +24,7 @@ public class AdministratorController {
         this.requests = requestRepo.getData();
     }
 
-    public void approveReplenishmentRequests() throws IOException {
+    public void approveReplenishmentRequests(Administrator admin) throws IOException {
         requestView.displayReplenishmentRequests(requests);
 
         for (ReplenishmentRequest request : requests) {

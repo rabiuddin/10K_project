@@ -34,7 +34,7 @@ public class AdministratorStaffController {
         users = userRepo.getData();
     }
 
-    public void manageHospitalStaff() throws IOException, ClassNotFoundException {
+    public void manageHospitalStaff(Administrator admin) throws IOException, ClassNotFoundException {
         while (true) {
             adminView.displayStaffManagementMenu();
             int choice = adminView.getChoiceInput();
@@ -198,7 +198,7 @@ public class AdministratorStaffController {
 
             return appointments1;
         }
-        public void viewAppointmentsDetails () throws IOException, ClassNotFoundException {
+        public void viewAppointmentsDetails (Administrator admin) throws IOException, ClassNotFoundException {
             List<Appointment> appointmentsList = new ArrayList<>();
             appointmentsList = getAllAppointments();
             int length = appointmentsList.size();
