@@ -41,4 +41,18 @@ public class PatientController {
             System.out.println("Patient not found in the records.");
         }
     }
+    public void changePassword(String newPassword, String patientID) throws IOException, ClassNotFoundException {
+        UserRepo userRepo = new UserRepo();
+        userRepo.loadData();
+        List<User> users = userRepo.getData();
+
+        for(User user : users) {
+            if(user instanceof Patient && user.getUserID().equals(patientID)) {
+                user.setPassword(newPassword);
+                userRepo.setUsers(users);
+                userRepo.saveData();
+                break;
+            }
+        }
+    }
 }

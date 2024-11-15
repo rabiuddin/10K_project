@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 public class DoctorPatientView {
     static Scanner scanner = new Scanner(System.in);
+
     public void viewPatientRecord(Doctor doctor) throws IOException, ClassNotFoundException {
         DoctorController doctorController = new DoctorController();
         System.out.print("Enter patient ID: ");
@@ -18,8 +19,8 @@ public class DoctorPatientView {
 
         doctorController.viewPatientRecord(doctor, patientID);
     }
-
-    public void updatePatientRecord(){
+    public void updatePatientRecord() throws IOException, ClassNotFoundException {
+        DoctorController doctorController = new DoctorController();
         System.out.print("Enter Patient ID: ");
         String patientID = scanner.next();
         System.out.print("Enter diagnosis: ");
@@ -27,6 +28,7 @@ public class DoctorPatientView {
         System.out.print("Enter treatment: ");
         String treatment = scanner.next();
 
+        doctorController.updatePatientMedicalRecord(patientID, diagnosis, treatment);
 
     }
 }

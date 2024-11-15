@@ -14,7 +14,10 @@ import java.util.List;
 
 public class PatientAppointmentView {
     static Scanner scanner = new Scanner(System.in);
-    public static void viewAvailableAppointmentSlots(List<User> users) {
+    public void viewAvailableAppointmentSlots() throws IOException, ClassNotFoundException {
+        UserRepo userRepo = new UserRepo();
+        userRepo.loadData();
+        List<User> users = userRepo.getData();
         System.out.println("Available Appointment Slots:");
         for (User user : users) {
             if (user instanceof Doctor doctor) {
@@ -25,13 +28,13 @@ public class PatientAppointmentView {
             }
         }
     }
-    public static void scheduleAppointment(Patient patient) throws IOException, ClassNotFoundException {
+    public void scheduleAppointment(Patient patient) throws IOException, ClassNotFoundException {
         PatientAppointmentController patientAppointmentController = new PatientAppointmentController();
         List<User> users = new ArrayList<>();
         UserRepo userRepo = new UserRepo();
         userRepo.loadData();
         users = userRepo.getData();
-        viewAvailableAppointmentSlots(users);
+        viewAvailableAppointmentSlots();
 
         System.out.print("Enter Doctor ID: ");
         String doctorID = scanner.nextLine();
@@ -43,7 +46,7 @@ public class PatientAppointmentView {
 
         patientAppointmentController.scheduleAppointment(doctorID, appointmentDateTime, patient);
     }
-    public static void viewScheduledAppointments(Patient patient) throws IOException, ClassNotFoundException {
+    public void viewScheduledAppointments(Patient patient) throws IOException, ClassNotFoundException {
         System.out.println("Scheduled Appointments:");
         AppointmentsRepo appointmentsRepo = new AppointmentsRepo();
         appointmentsRepo.loadData();
@@ -58,15 +61,7 @@ public class PatientAppointmentView {
             }
         }
     }
-    private static Appointment findAppointment(String appointmentID,List<Appointment> appointments) {
-        for (Appointment apt : appointments) {
-            if (apt.getAppointmentID().equals(appointmentID)) {
-                return apt;
-            }
-        }
-        return null;
-    }
-    public static void rescheduleAppointment(Patient patient) throws IOException, ClassNotFoundException {
+    public void rescheduleAppointment(Patient patient) throws IOException, ClassNotFoundException {
 
         PatientAppointmentController patientAppointmentController = new PatientAppointmentController();
         viewScheduledAppointments(patient);
@@ -80,7 +75,7 @@ public class PatientAppointmentView {
         patientAppointmentController.rescheduleAppointment(patient, appointmentID, newDateTime);
 
     }
-    public static void cancelAppointment(Patient patient) throws IOException, ClassNotFoundException {
+    public void cancelAppointment(Patient patient) throws IOException, ClassNotFoundException {
         PatientAppointmentController patientAppointmentController = new PatientAppointmentController();
         AppointmentsRepo appointmentsRepo = new AppointmentsRepo();
         appointmentsRepo.loadData();
@@ -98,5 +93,26 @@ public class PatientAppointmentView {
         System.out.print("Enter the Appointment ID to cancel: ");
         String appointmentID = scanner.nextLine();
         patientAppointmentController.cancelAppointment(patient, appointmentID);
+    }
+    public void viewPastAppointmentOutcomeRecords(Patient patient) throws IOException, ClassNotFoundException {
+        PatientAppointmentController patientAppointmentController = new PatientAppointmentController();
+        AppointmentsRepo appointmentsRepo = new AppointmentsRepo();
+        appointmentsRepo.loadData();
+        List<Appointment> appointments = appointmentsRepo.getData();
+        for (Appointment apt : appointments) {
+            if (!apt.getPatientID().equals(patient.getUserID()) || apt.getOutcomeRecord() == null) {
+                appointments.remove(apt);
+            }
+        }
+
+        for(Appointment apt : appointments){
+
+            AppointmentOutcomeRecord record = apt.getOutcomeRecord();
+            Prescription prescription = record.getPrescriptions().get(0);
+            Medication medication = prescription.getMedication();
+
+            System.out.println("Services Provided: " + record.getServiceType() + " Prescribed Medication: " + medication.getName() + " Consultation Notes: " + record.getConsultaionNotes());
+        }
+
     }
 }

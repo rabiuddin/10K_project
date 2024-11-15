@@ -11,7 +11,7 @@ public class PatientView {
     }
 
     static Scanner scanner = new Scanner(System.in);
-    public static void viewMedicalRecord(Patient patient) {
+    public void viewMedicalRecord(Patient patient) {
         System.out.println("Medical Record for " + patient.getName());
         System.out.println("Patient ID: " + patient.getUserID());
         System.out.println("Date of Birth: " + patient.getDateOfBirth());
@@ -29,7 +29,7 @@ public class PatientView {
             System.out.println("- " + treatment);
         }
     }
-    public static void updatePersonalInfo(Patient patient) throws IOException, ClassNotFoundException {
+    public void updatePersonalInfo(Patient patient) throws IOException, ClassNotFoundException {
         PatientController patientController = new PatientController();
         System.out.print("Enter new phone number: ");
         String newPhone = scanner.nextLine();
@@ -38,6 +38,12 @@ public class PatientView {
 
         patientController.updateContactInfo(newPhone, newEmail, patient);
         System.out.println("Contact information updated successfully.");
+    }
+    public void changePassword(Patient patient) throws IOException, ClassNotFoundException {
+        PatientController patientController = new PatientController();
+        System.out.print("Enter new password: ");
+        String newPassword = scanner.nextLine();
+        patientController.changePassword(newPassword, patient.getUserID());
     }
 
 }
